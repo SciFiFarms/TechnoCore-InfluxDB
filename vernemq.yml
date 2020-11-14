@@ -1,0 +1,21 @@
+version: "3.5"
+secrets:
+  mqtt_esphome_password:
+    name: ${STACK_NAME:-technocore}_mqtt_esphome_password
+    external: true
+  esphome_mqtt_password:
+    name: ${STACK_NAME:-technocore}_esphome_mqtt_password
+    external: true
+
+services:
+  mqtt:
+    networks:
+      - esphome
+    secrets:
+      - source: mqtt_esphome_password
+        target: users/esphome
+
+  esphome:
+    secrets:
+      - source: esphome_mqtt_password
+        target: mqtt_password

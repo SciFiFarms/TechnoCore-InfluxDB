@@ -11,22 +11,12 @@ volumes:
   EXAMPLE_SERVICE:
   EXAMPLE_SERVICE-db:
 
-#secrets:
-  # Secrets format
-  # ${service_name}_${mount_point}:
-  #   name: ${STACK_NAME:-technocore}_${service_name}_${mount_point}
-  # #   external: true
-  EXAMPLE_SERVICE_admin_username:
-    name: ${STACK_NAME:-technocore}_EXAMPLE_SERVICE_admin_username
-    external: true
+secrets:
   EXAMPLE_SERVICE_admin_password:
     name: ${STACK_NAME:-technocore}_EXAMPLE_SERVICE_admin_password
     external: true
-  EXAMPLE_SERVICE_EXAMPLE_SERVICE-db_username:
-    name: ${STACK_NAME:-technocore}_EXAMPLE_SERVICE_EXAMPLE_SERVICE-db_username
-    external: true
-  EXAMPLE_SERVICE_EXAMPLE_SERVICE-db_password:
-    name: ${STACK_NAME:-technocore}_EXAMPLE_SERVICE_EXAMPLE_SERVICE-db_password
+  EXAMPLE_SERVICE_EXAMPLE_SERVICE_db_password:
+    name: ${STACK_NAME:-technocore}_EXAMPLE_SERVICE_EXAMPLE_SERVICE_db_password
     external: true
 
 services:
@@ -41,10 +31,10 @@ services:
       #  # These env vars should infact be uppercase
       #  - traefik.frontend.rule=$EXAMPLE_SERVICE_ROUTING_LABEL
       #  - traefik.frontend.priority=$EXAMPLE_SERVICE_ROUTING_LABEL_PRIORITY
+      #  # You'll need to set applicaiton's port here.
       #  - traefik.port=SET_ME_PLEASE
       #  - ${TRAEFIK_BASIC_AUTH}
       #  - traefik.enable=true
-      #  # You'll need to set applicaiton's port here.
       #  - traefik.tags=ingress 
       #  - traefik.docker.network=${STACK_NAME:-technocore}_EXAMPLE_SERVICE
       #  # Traefik service that listens to HTTP
@@ -65,9 +55,12 @@ services:
           memory: 128M
         reservations:
           memory: 64M
-    #environment:
+    environment:
       # Sometimes you have to pass in ${DOMAIN} to enable the correct link paths to be generated.
       # Othertimes you can use http:// or https:// for the website. Weird trick.
+      #- MQTT_USER=${EXAMPLE_SERVICE}
+      - ADMIN_USER=${ADMIN_USER}
+      - ADMIN_PASSWORD={{"{{DOCKER-SECRET:admin_password}}"}}
     image: ${image_provider:-scififarms}/technocore-EXAMPLE_SERVICE:${TAG:-latest}
     logging:
       driver: "${LOGGING_DRIVER}"
@@ -77,15 +70,13 @@ services:
       - EXAMPLE_SERVICE
       - EXAMPLE_SERVICE-private
     #secrets:
-    #  - source: EXAMPLE_SERVICE_EXAMPLE_SERVICE_db_username
-    #    target: EXAMPLE_SERVICE_db_username
     #  - source: EXAMPLE_SERVICE_EXAMPLE_SERVICE_db_password
     #    target: EXAMPLE_SERVICE_db_password
-    #  - source: EXAMPLE_SERVICE_domain
-    #    target: domain
     volumes:
       # Likely need to change this
       - EXAMPLE_SERVICE:/var/lib/EXAMPLE_SERVICE
+      # This should in fact be all upper case.
+      - ${DEV_MOUNT_EXAMPLE_SERVICE_SHELL_MIGRATIONS:-$EMPTY_MOUNT}
 
   EXAMPLE_SERVICE_db:
     deploy:
@@ -103,12 +94,8 @@ services:
     networks:
       - EXAMPLE_SERVICE-private
     secrets:
-      - source: EXAMPLE_SERVICE_db_admin_username
-        target: admin_username
       - source: EXAMPLE_SERVICE_db_admin_password
         target: admin_password
-      - source: EXAMPLE_SERVICE_db_EXAMPLE_SERVICE_username
-        target: EXAMPLE_SERVICE_username
       - source: EXAMPLE_SERVICE_db_EXAMPLE_SERVICE_password
         target: EXAMPLE_SERVICE_password
     volumes:

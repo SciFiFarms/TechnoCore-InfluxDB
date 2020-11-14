@@ -46,10 +46,7 @@ env_secrets_expand() {
 env_secrets_expand
 
 # Add any additional script here. 
-if cat /run/secrets/admin_password | grep "Not yet set." &> /dev/null; then
-    echo "Credentials not yet set. Waiting until they are set."
-    # It'll automatically reboot when the credentials are added.
-    sleep 1000d
-fi
+dogfish migrate &
 
 /entrypoint.sh influxd
+#exec "$@"
