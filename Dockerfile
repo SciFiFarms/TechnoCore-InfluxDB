@@ -1,4 +1,4 @@
-FROM influxdb:1.8.0
+FROM influxdb:1.8.3
 #ENV INFLUXDB_HTTP_HTTPS_ENABLED true
 #ENV INFLUXDB_HTTP_HTTPS_CERTIFICATE /run/secrets/cert_bundle
 #ENV INFLUXDB_HTTP_HTTPS_PRIVATE_KEY /run/secrets/key
