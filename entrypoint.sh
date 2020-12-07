@@ -48,5 +48,4 @@ env_secrets_expand
 # Add any additional script here. 
 dogfish migrate &
 
-/entrypoint.sh influxd
-#exec "$@"
+exec "$@"
